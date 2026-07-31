@@ -11,8 +11,6 @@ services:
     volumes:
       - ./api:/app
     restart: unless-stopped
-    networks:
-      - homepulse_net
 
   frontend:
     build:
@@ -20,7 +18,7 @@ services:
       dockerfile: Dockerfile
     container_name: homepulse-frontend
     ports:
-      - "3000:3000"
+      - "9264:9264"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -28,9 +26,3 @@ services:
     restart: unless-stopped
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000 
-    networks:
-      - homepulse_net
-
-networks:
-  homepulse_net:
-    driver: bridge

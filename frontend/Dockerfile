@@ -11,7 +11,8 @@ RUN npm ci
 # Copiar o restante código
 COPY . .
 
-EXPOSE 3000
+ENV PORT 9264
+EXPOSE 9264
 
 # Iniciar em modo de desenvolvimento (com hot-reload)
 CMD ["npm", "run", "dev"]
