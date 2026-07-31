@@ -45,8 +45,25 @@ export default function Dashboard() {
 
   // Derived states
   const isServerOnline = !!health && health.status === "ok";
-  const batteryPct = powerLatest?.battery_percent !== null && powerLatest?.battery_percent !== undefined ? Math.round(powerLatest?.battery_percent) : undefined;
-  const isPluggedIn = powerLatest?.is_plugged_in;
+  
+  const getLastValid = (key: string) => {
+    if (powerLatest && powerLatest[key] !== null && powerLatest[key] !== undefined) return powerLatest[key];
+    if (powerHistory) {
+      for (const log of powerHistory) {
+        if (log[key] !== null && log[key] !== undefined) return log[key];
+      }
+    }
+    return null;
+  };
+
+  const currentBattery = getLastValid("battery_percent");
+  const batteryPct = currentBattery !== null ? Math.round(currentBattery) : undefined;
+  
+  const isPluggedIn = getLastValid("is_plugged_in");
+  const currentVoltage = getLastValid("voltage");
+  const currentWattage = getLastValid("wattage");
+  const currentGridStatus = getLastValid("grid_status");
+
   const hasOngoingOutage = outages && outages.length > 0 && !outages[0].end_time;
   const isNetworkOk = networkHistory && networkHistory.length > 0 ? networkHistory[0].status : false;
 
@@ -182,9 +199,9 @@ export default function Dashboard() {
                   {hasOngoingOutage ? <AlertTriangle className="h-4 w-4 text-destructive" /> : <ActivitySquare className="h-4 w-4 text-green-500" />}
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{isPluggedIn === null ? "---" : (hasOngoingOutage ? "OUTAGE" : "STABLE")}</div>
+                  <div className="text-2xl font-bold">{isPluggedIn === null ? "---" : (isPluggedIn ? "STABLE" : "OUTAGE")}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {isPluggedIn === null ? "Docker WSL Limitation" : (hasOngoingOutage ? "Running on UPS/Battery" : "Normal service")}
+                    {isPluggedIn === null ? "Docker WSL Limitation" : (isPluggedIn ? "Normal service" : "Running on UPS/Battery")}
                   </p>
                 </CardContent>
               </Card>
@@ -428,7 +445,7 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{powerLatest?.voltage ? `${powerLatest.voltage.toFixed(1)}V` : "---"}</div>
+                  <div className="text-3xl font-bold">{currentVoltage !== null && currentVoltage !== undefined ? `${currentVoltage.toFixed(1)}V` : "---"}</div>
                 </CardContent>
               </Card>
               <Card className="rounded-none bg-slate-900/50">
@@ -438,7 +455,7 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{powerLatest?.wattage ? `${powerLatest.wattage.toFixed(1)}W` : "---"}</div>
+                  <div className="text-3xl font-bold">{currentWattage !== null && currentWattage !== undefined ? `${currentWattage.toFixed(1)}W` : "---"}</div>
                 </CardContent>
               </Card>
               <Card className="rounded-none bg-slate-900/50">
@@ -448,7 +465,7 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl font-bold pt-1">{isPluggedIn === null ? "UNKNOWN" : (hasOngoingOutage ? "OUTAGE (BATTERY)" : "ONLINE (AC)")}</div>
+                  <div className="text-3xl font-bold">{currentGridStatus || "UNKNOWN"}</div>
                 </CardContent>
               </Card>
             </div>
