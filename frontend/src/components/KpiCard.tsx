@@ -12,26 +12,26 @@ interface KpiCardProps {
 
 export function KpiCard({ title, value, subtitle, icon, statusColor = "neutral", progress }: KpiCardProps) {
   const colorStyles = {
-    green: "text-emerald-400 border-emerald-400/20 bg-emerald-400/5",
-    red: "text-rose-500 border-rose-500/20 bg-rose-500/5",
-    orange: "text-orange-500 border-orange-500/20 bg-orange-500/5",
-    neutral: "text-white border-white/10 bg-white/5",
+    green: "text-emerald-400 border-emerald-400/30 bg-emerald-400/5",
+    red: "text-rose-500 border-rose-500/30 bg-rose-500/5",
+    orange: "text-orange-500 border-orange-500/30 bg-orange-500/5",
+    neutral: "text-white border-white/20 bg-white/5",
   };
 
   const ringColors = {
     green: "text-emerald-400",
     red: "text-rose-500",
     orange: "text-orange-500",
-    neutral: "text-white/20",
+    neutral: "text-white/30",
   };
 
   return (
-    <div className={cn("relative overflow-hidden rounded-2xl border backdrop-blur-md p-6 flex flex-col justify-between gap-4 transition-all hover:bg-white/10", colorStyles[statusColor])}>
+    <div className={cn("relative overflow-hidden rounded-none border p-6 flex flex-col justify-between gap-4 transition-colors hover:bg-white/10", colorStyles[statusColor])}>
       <div className="flex justify-between items-start">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-slate-400">{title}</p>
-          <h3 className="text-3xl font-bold tracking-tight">{value}</h3>
-          {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
+          <p className="text-xs uppercase tracking-widest font-bold text-slate-500">{title}</p>
+          <h3 className="text-3xl font-mono tracking-tight">{value}</h3>
+          {subtitle && <p className="text-xs font-mono text-slate-400 mt-2">{subtitle}</p>}
         </div>
         
         <div className="relative w-12 h-12 flex items-center justify-center">
@@ -39,20 +39,27 @@ export function KpiCard({ title, value, subtitle, icon, statusColor = "neutral",
             <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
               <path
                 className="text-white/5"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                d="M1 18 h34"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="3"
+                strokeWidth="1"
               />
               <path
-                className={ringColors[statusColor]}
-                strokeDasharray={`${progress}, 100`}
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                className="text-white/5"
+                d="M18 1 v34"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="3"
+                strokeWidth="1"
               />
+              {/* Replace the smooth circle with a rigid square tracker if needed, or keep the ring but thin. Let's make it a square border progress. */}
             </svg>
+          )}
+          {/* A simple square progress bar replacement */}
+           {progress !== undefined && (
+            <div className="absolute inset-0 border border-white/10" style={{
+              background: `conic-gradient(from 180deg, currentColor ${progress}%, transparent ${progress}%)`,
+              opacity: 0.2
+            }} />
           )}
           <div className="z-10">{icon}</div>
         </div>

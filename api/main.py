@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
 
 # Imports dos módulos
@@ -26,6 +27,14 @@ async def lifespan(app: FastAPI):
     pw_task.cancel()
 
 app = FastAPI(title="HomePulse API", description="API de monitorização do servidor", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Incluir Routers
 app.include_router(health.router)
