@@ -1,0 +1,27 @@
+# Python / FastAPI
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Database
+*.sqlite3
+*.db
+homepulse.db
+
+# Node
+node_modules/
+.next/
+dist/
+out/
+build/
+.npm/
+
+# OS
+.DS_Store
+Thumbs.db
