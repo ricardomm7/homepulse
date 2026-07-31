@@ -61,7 +61,7 @@ export default function Dashboard() {
   const paginatedPowerHistory = powerHistory?.slice((powerHistPage - 1) * powerItemsPerPage, powerHistPage * powerItemsPerPage) || [];
 
   // Chart Mappers
-  const powerChartData = [...(powerHistory || [])].reverse().map((d, i, arr) => {
+  const powerChartData = [...(powerHistory || [])].reverse().map((d: any, i: number, arr: any[]) => {
     const isOutage = d.is_plugged_in === 0 || d.is_plugged_in === false;
     const nextIsOutage = i < arr.length - 1 ? (arr[i+1].is_plugged_in === 0 || arr[i+1].is_plugged_in === false) : isOutage;
 
@@ -95,10 +95,10 @@ export default function Dashboard() {
   const filteredNetHistory = useMemo(() => {
     if (!networkHistory) return [];
     const cutoff = subHours(new Date(), parseInt(networkTimeFilter));
-    return networkHistory.filter(d => new Date(d.timestamp + "Z") >= cutoff);
+    return networkHistory.filter((d: any) => new Date(d.timestamp + "Z") >= cutoff);
   }, [networkHistory, networkTimeFilter]);
 
-  const netChartData = [...filteredNetHistory].reverse().map(d => ({
+  const netChartData = [...filteredNetHistory].reverse().map((d: any) => ({
     ...d,
     time: format(parseISO(d.timestamp + "Z"), "HH:mm:ss"),
     ping: d.status ? 1 : 0
@@ -107,10 +107,10 @@ export default function Dashboard() {
   const filteredSpeedHistory = useMemo(() => {
     if (!speedtestHistory) return [];
     const cutoff = subHours(new Date(), parseInt(networkTimeFilter));
-    return speedtestHistory.filter(d => new Date(d.timestamp + "Z") >= cutoff);
+    return speedtestHistory.filter((d: any) => new Date(d.timestamp + "Z") >= cutoff);
   }, [speedtestHistory, networkTimeFilter]);
 
-  const speedChartData = [...filteredSpeedHistory].reverse().map(d => ({
+  const speedChartData = [...filteredSpeedHistory].reverse().map((d: any) => ({
     ...d,
     time: format(parseISO(d.timestamp + "Z"), "HH:mm"),
     download: d.download_mbps,
@@ -234,7 +234,7 @@ export default function Dashboard() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {paginatedOutages.map((outage) => (
+                        {paginatedOutages.map((outage: any) => (
                           <TableRow key={outage.id}>
                             <TableCell className="font-medium pl-6">
                               {format(parseISO(outage.start_time.replace(' ', 'T') + "Z"), "dd/MM/yyyy")}
@@ -528,7 +528,7 @@ export default function Dashboard() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {paginatedPowerHistory.map((log) => (
+                      {paginatedPowerHistory.map((log: any) => (
                         <TableRow key={log.id}>
                           <TableCell className="font-medium pl-6 text-muted-foreground">
                             {format(parseISO(log.timestamp + "Z"), "dd/MM/yyyy HH:mm:ss")}
