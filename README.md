@@ -6,6 +6,16 @@ Built with an industrial, "techy", and zero-radius design philosophy, HomePulse 
 
 ---
 
+## 📸 Dashboard Preview
+
+These screenshots show the two main dashboard views:
+
+![HomePulse Power tab](docs/IMG73.png)
+
+![HomePulse Network tab](docs/IMG79.png)
+
+---
+
 ## 🎯 What is it designed for?
 
 HomePulse was built to solve a specific problem in Homelab environments: **Hardware and Network observability without the overhead of heavy enterprise tools (like Grafana/Prometheus).** 
