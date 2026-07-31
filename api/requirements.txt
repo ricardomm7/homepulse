@@ -2,3 +2,5 @@ fastapi
 uvicorn[standard]
 psutil
 speedtest-cli
+
+speedtest-cli

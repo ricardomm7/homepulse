@@ -37,5 +37,27 @@ def init_db():
             interface_max_speed_mbps REAL
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS power_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            battery_percent REAL,
+            is_plugged_in BOOLEAN,
+            grid_status TEXT,
+            voltage REAL,
+            wattage REAL
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS grid_outage_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            start_time DATETIME NOT NULL,
+            end_time DATETIME,
+            duration_minutes REAL
+        )
+    ''')
+
     conn.commit()
     conn.close()

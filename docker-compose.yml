@@ -8,8 +8,10 @@ services:
     container_name: homepulse-api
     ports:
       - "8000:8000"
+    privileged: true
     volumes:
       - ./api:/app
+      - /sys:/sys:ro
     restart: unless-stopped
 
   frontend:
