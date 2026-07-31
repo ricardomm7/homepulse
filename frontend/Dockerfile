@@ -11,8 +11,11 @@ RUN npm ci
 # Copiar o restante código
 COPY . .
 
+# Construir a aplicação para produção
+RUN npm run build
+
 ENV PORT 9264
 EXPOSE 9264
 
-# Iniciar em modo de desenvolvimento (com hot-reload)
-CMD ["npm", "run", "dev"]
+# Iniciar em modo de produção
+CMD ["npm", "run", "start"]
