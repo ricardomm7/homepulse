@@ -1,65 +1,127 @@
-import Image from "next/image";
+"use client"
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { Header } from "@/components/Header";
+import { KpiCard } from "@/components/KpiCard";
+import { NetworkChart } from "@/components/charts/NetworkChart";
+import { SpeedtestChart } from "@/components/charts/SpeedtestChart";
+import { PowerChart } from "@/components/charts/PowerChart";
+import { OutageHistory } from "@/components/OutageHistory";
+import { Battery, BatteryWarning, Globe, Wifi, ActivitySquare, AlertTriangle, Zap } from "lucide-react";
 
-export default function Home() {
+export default function Dashboard() {
+  const { 
+    health, 
+    powerLatest, 
+    powerHistory, 
+    outages, 
+    networkHistory, 
+    speedtestLatest, 
+    speedtestHistory, 
+    isLoading 
+  } = useDashboardData();
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-emerald-400 animate-pulse">A iniciar HomePulse...</div>;
+  }
+
+  // Derived states
+  const isServerOnline = !!health && health.status === "ok";
+  const batteryPct = powerLatest?.battery_percent !== null && powerLatest?.battery_percent !== undefined ? Math.round(powerLatest?.battery_percent) : undefined;
+  const isPluggedIn = powerLatest?.is_plugged_in;
+  const lastDown = speedtestLatest?.download_mbps ? speedtestLatest.download_mbps.toFixed(1) : "--";
+  const lastUp = speedtestLatest?.upload_mbps ? speedtestLatest.upload_mbps.toFixed(1) : "--";
+  const isNetworkOk = networkHistory && networkHistory.length > 0 ? networkHistory[0].status : false;
+  
+  // Has ongoing outage?
+  const hasOngoingOutage = outages && outages.length > 0 && !outages[0].end_time;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-slate-950 text-slate-50 p-4 md:p-8 font-sans selection:bg-emerald-500/30">
+      <div className="max-w-7xl mx-auto space-y-6">
+        
+        <Header isOnline={isServerOnline} />
+
+        {/* KPI Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <KpiCard 
+            title="Estado da Bateria" 
+            value={batteryPct !== undefined ? `${batteryPct}%` : "N/A"} 
+            subtitle={isPluggedIn ? "A carregar / Ligado à Corrente" : "A descarregar / Bateria"}
+            icon={isPluggedIn ? <Zap className="text-emerald-400" /> : <BatteryWarning className="text-rose-500" />}
+            statusColor={isPluggedIn ? "green" : (batteryPct && batteryPct < 20 ? "red" : "orange")}
+            progress={batteryPct}
+          />
+
+          <KpiCard 
+            title="Rede Elétrica da Casa" 
+            value={hasOngoingOutage ? "CORTE DETETADO" : "ONLINE"} 
+            subtitle={hasOngoingOutage ? "O servidor está a usar bateria" : "Energia estabilizada"}
+            icon={hasOngoingOutage ? <AlertTriangle className="text-rose-500" /> : <ActivitySquare className="text-emerald-400" />}
+            statusColor={hasOngoingOutage ? "red" : "green"}
+          />
+
+          <KpiCard 
+            title="Conectividade (Ping)" 
+            value={isNetworkOk ? "ONLINE" : "FALHA"} 
+            subtitle={`Interface: ${health?.active_interface || "N/A"} (${health?.interface_speed_mbps || 0} Mbps)`}
+            icon={<Globe className={isNetworkOk ? "text-emerald-400" : "text-rose-500"} />}
+            statusColor={isNetworkOk ? "green" : "red"}
+          />
+
+          <KpiCard 
+            title="Último Speedtest" 
+            value={`${lastDown} / ${lastUp}`} 
+            subtitle="Download / Upload (Mbps)"
+            icon={<Wifi className="text-blue-400" />}
+            statusColor="neutral"
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+          
+          {/* Main Power Chart takes 2 columns on desktop */}
+          <div className="lg:col-span-2 border border-white/10 bg-white/5 rounded-3xl p-6 backdrop-blur-md">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Battery className="w-5 h-5 text-emerald-400" /> 
+                Saúde Energética & Bateria
+              </h2>
+              {powerLatest?.voltage && (
+                <span className="text-xs font-mono text-slate-400 bg-black/20 px-3 py-1 rounded-full">
+                  {powerLatest.voltage.toFixed(2)}V | {powerLatest.wattage?.toFixed(2) || 0}W
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-slate-400 mb-6">Visualização da descarga e cortes de luz (áreas vermelhas indicam cortes).</p>
+            <PowerChart data={powerHistory} outages={outages} />
+          </div>
+
+          {/* Network side */}
+          <div className="space-y-6 flex flex-col">
+            <div className="border border-white/10 bg-white/5 rounded-3xl p-6 backdrop-blur-md flex-1">
+               <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-2">
+                <Globe className="w-4 h-4 text-blue-400" /> 
+                Estabilidade (Ping)
+              </h2>
+              <NetworkChart data={networkHistory} />
+            </div>
+
+            <div className="border border-white/10 bg-white/5 rounded-3xl p-6 backdrop-blur-md flex-1">
+               <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-2">
+                <Wifi className="w-4 h-4 text-purple-400" /> 
+                Desempenho da Rede
+              </h2>
+              <SpeedtestChart data={speedtestHistory} />
+            </div>
+          </div>
         </div>
-      </main>
+
+        {/* Outage logs */}
+        <OutageHistory outages={outages} />
+
+      </div>
     </div>
   );
 }
